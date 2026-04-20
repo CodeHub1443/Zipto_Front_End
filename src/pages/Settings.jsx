@@ -163,30 +163,66 @@ function PlatformSettings() {
         <span style={{ fontSize: 12, color: C.a1, fontWeight: 500, cursor: 'pointer' }}>Need help?</span>
       </div>
 
-      {/* Connected FB card */}
-      <div style={{ background: C.white, border: `2px solid ${metaConnected ? '#C7D2FE' : '#E2E8F0'}`, borderRadius: 16, padding: 16, marginBottom: metaConnected ? 0 : 14, boxShadow: '0 2px 20px rgba(14,25,55,.07)', borderBottomLeftRadius: metaConnected ? 0 : 16, borderBottomRightRadius: metaConnected ? 0 : 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, background: '#1877F2', borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, fontWeight: 700, color: '#fff' }}>f</div>
+      {/* 3×3 platform grid — Meta is the first card */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18 }}>
+
+        {/* Meta / Facebook card */}
+        <div style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px', border: metaConnected ? '2px solid #C7D2FE' : '2px solid transparent' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, background: '#1877F2', borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#fff', flexShrink: 0 }}>f</div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: C.t1, marginBottom: 2 }}>Meta / Facebook</div>
-              <div style={s.tiny}>{metaConnected ? 'KB Aviation · 13,497 followers · Connected Apr 6, 2026' : 'Not connected'}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>Meta / Facebook</div>
+              <div style={s.tiny}>{metaConnected ? 'Connected' : 'Not connected'}</div>
             </div>
+            {metaConnected && <V1Badge variant="green" dot style={{ marginLeft: 'auto' }}>✓</V1Badge>}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {metaConnected
-              ? <><V1Badge variant="green" dot>Connected</V1Badge><Btn variant="secondary" size="sm">Sync now</Btn><Btn variant="danger" size="sm" onClick={() => setMetaConnected(false)}>Disconnect</Btn></>
-              : <Btn variant="primary" size="sm" onClick={() => setMetaConnected(true)}>Connect Meta</Btn>
+          {metaConnected
+            ? <div style={{ display: 'flex', gap: 6 }}>
+                <Btn variant="secondary" size="sm" style={{ flex: 1, justifyContent: 'center' }}>Sync</Btn>
+                <Btn variant="danger" size="sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setMetaConnected(false)}>Disconnect</Btn>
+              </div>
+            : <Btn variant="primary" size="sm" style={{ justifyContent: 'center', width: '100%' }} onClick={() => setMetaConnected(true)}>Connect</Btn>
+          }
+        </div>
+
+        {/* Other platforms */}
+        {platforms.map(({ id, bg, label, name, sub, soon }) => (
+          <div key={id} style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 36, height: 36, background: bg, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{label}</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>{name}</div>
+                <div style={s.tiny}>{sub}</div>
+              </div>
+            </div>
+            {soon
+              ? <Btn variant="secondary" size="sm" style={{ justifyContent: 'center', color: C.t3, width: '100%' }}>Coming soon</Btn>
+              : <Btn variant="primary" size="sm" style={{ justifyContent: 'center', width: '100%' }}>Connect</Btn>
             }
           </div>
+        ))}
+
+        {/* Request connector card */}
+        <div style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px', border: '2px dashed #C7D2FE', background: '#FAFBFF', boxShadow: 'none' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, background: C.inner, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.t3, fontSize: 17, flexShrink: 0 }}>+</div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: C.t2 }}>Request connector</div>
+              <div style={s.tiny}>Need another?</div>
+            </div>
+          </div>
+          <Btn variant="ghost" size="sm" style={{ justifyContent: 'center', width: '100%' }}>Request →</Btn>
         </div>
       </div>
 
-      {/* ── Page & Ad Account selector — only shown when Meta is connected ── */}
+      {/* ── Page & Ad Account selector — appears below grid only when Meta is connected ── */}
       {metaConnected && (
-        <div style={{ background: '#FAFBFF', border: '2px solid #C7D2FE', borderTop: 'none', borderRadius: '0 0 16px 16px', padding: '18px 20px', marginBottom: 14 }}>
+        <div style={{ ...s.card, marginBottom: 18, border: '2px solid #C7D2FE', background: '#FAFBFF' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.t1, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 20, height: 20, background: '#1877F2', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff' }}>f</div>
+            Meta Account Setup
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-            
             {/* Facebook Page selector */}
             <div>
               <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Facebook Page</div>
@@ -204,7 +240,6 @@ function PlatformSettings() {
                 ))}
               </div>
             </div>
-
             {/* Ad Account selector */}
             <div>
               <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Ad Account</div>
@@ -221,39 +256,15 @@ function PlatformSettings() {
                   </div>
                 ))}
               </div>
-              <div style={{ background: '#EEF2FF', borderRadius: 10, padding: '9px 12px', fontSize: 11, color: C.a1 }}>
+              <div style={{ background: '#EEF2FF', borderRadius: 10, padding: '9px 12px', fontSize: 11, color: C.a1, marginBottom: 12 }}>
                 💡 Your selected page and ad account will be used for all Zipto campaigns by default.
               </div>
-              <div style={{ marginTop: 12 }}>
-                <Btn variant="primary" style={{ width: '100%', justifyContent: 'center' }}>Save selection</Btn>
-              </div>
+              <Btn variant="primary" style={{ width: '100%', justifyContent: 'center' }}>Save selection</Btn>
             </div>
           </div>
         </div>
       )}
 
-      {/* 3×3 platform grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18, marginTop: metaConnected ? 14 : 0 }}>
-        {platforms.map(({ id, bg, label, name, sub, soon }) => (
-          <div key={id} style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 36, height: 36, background: bg, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{label}</div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>{name}</div>
-                <div style={s.tiny}>{sub}</div>
-              </div>
-            </div>
-            {soon
-              ? <Btn variant="secondary" size="sm" style={{ justifyContent: 'center', color: C.t3, width: '100%' }}>Coming soon</Btn>
-              : <Btn variant="primary" size="sm" style={{ justifyContent: 'center', width: '100%' }}>Connect</Btn>
-            }
-          </div>
-        ))}
-        {/* Request connector card */}
-        <div style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px', border: '2px dashed #C7D2FE', background: '#FAFBFF', boxShadow: 'none' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, background: C.inner, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.t3, fontSize: 17, flexShrink: 0 }}>+</div>
-            <div>
               <div style={{ fontSize: 12, fontWeight: 500, color: C.t2 }}>Request connector</div>
               <div style={s.tiny}>Need another?</div>
             </div>
