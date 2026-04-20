@@ -116,11 +116,10 @@ export default function Settings({ alertCount, onAlertClick }) {
         <div style={{ flex: 1, background: '#FFFFFF', borderRadius: 18, boxShadow: '0 2px 20px rgba(14,25,55,.07)', overflowY: 'auto', padding: '22px 26px' }}>
           {activeTab === 'Platform Integration' && <PlatformSettings />}
           {activeTab === 'Brand AI' && <BrandSettings />}
-          {!['Platform Integration', 'Brand AI'].includes(activeTab) && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: C.t3, fontSize: 14 }}>
-              {activeTab} settings coming soon
-            </div>
-          )}
+          {activeTab === 'Payment & Plan' && <PaymentPlanSettings />}
+          {activeTab === 'Audience' && <AudienceSettings />}
+          {activeTab === 'Chatbot' && <ChatbotSettings />}
+          {activeTab === 'Tracking' && <TrackingSettings />}
         </div>
       </div>
     </PageShell>
@@ -313,6 +312,329 @@ function BrandSettings() {
           <div style={{ height: 7, background: '#C7D2FE', borderRadius: 100, overflow: 'hidden' }}>
             <div style={{ width: '87%', height: '100%', background: 'linear-gradient(90deg,#8B5CF6,#6366F1)', borderRadius: 100 }} />
           </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── Payment & Plan ──────────────────────────────────────────────────
+function PaymentPlanSettings() {
+  const plans = [
+    { name: 'Starter',  price: '$9',  credits: '500 cr/mo',   features: ['1 Platform', '500 credits', 'Basic AI copy', 'Email support'], current: false },
+    { name: 'Pro',      price: '$29', credits: '2,000 cr/mo', features: ['3 Platforms', '2,000 credits', 'AI Sales Assistant', 'Priority support'], current: true },
+    { name: 'Business', price: '$79', credits: '8,000 cr/mo', features: ['All Platforms', '8,000 credits', 'Custom AI model', 'Dedicated support'], current: false },
+  ];
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div><div style={s.pgCtx}>Step 3 of 6</div><div style={s.pgTitle}>Payment & <b>plan</b></div></div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 18 }}>
+        {plans.map(p => (
+          <div key={p.name} style={{ ...s.card, border: p.current ? '2px solid #6366F1' : '2px solid transparent', position: 'relative' }}>
+            {p.current && <span style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: '#6366F1', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 10px', borderRadius: 100 }}>CURRENT</span>}
+            <div style={{ fontSize: 16, fontWeight: 700, color: C.t1, marginBottom: 4 }}>{p.name}</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: C.a1, marginBottom: 2 }}>{p.price} <span style={{ fontSize: 13, fontWeight: 400, color: C.t3 }}>/ mo</span></div>
+            <div style={{ fontSize: 12, color: C.t3, marginBottom: 14 }}>{p.credits}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+              {p.features.map(f => (
+                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="8" height="8" fill="none" stroke="#059669" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                  </div>
+                  <span style={{ fontSize: 12, color: C.t2 }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <Btn variant={p.current ? 'secondary' : 'primary'} style={{ width: '100%', justifyContent: 'center' }}>
+              {p.current ? 'Current plan' : `Upgrade to ${p.name}`}
+            </Btn>
+          </div>
+        ))}
+      </div>
+
+      <div style={s.card}>
+        <div style={{ ...s.sect, marginBottom: 14 }}>Payment method</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F8FAFD', borderRadius: 12, padding: '12px 16px', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ background: '#1A1F71', color: '#fff', fontWeight: 800, fontSize: 12, padding: '6px 12px', borderRadius: 8 }}>VISA</div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>•••• •••• •••• 4242</div>
+              <div style={{ fontSize: 11, color: C.t3 }}>Expires 08 / 27</div>
+            </div>
+          </div>
+          <V1Badge variant="green">Default</V1Badge>
+        </div>
+        <Btn variant="ghost">+ Add payment method</Btn>
+      </div>
+    </>
+  );
+}
+
+// ─── Audience Settings ───────────────────────────────────────────────
+function AudienceSettings() {
+  const segments = [
+    { name: 'Travel Enthusiasts', size: '4,200',  tag: 'Auto',   clr: '#06B6D4' },
+    { name: 'Frequent Flyers',    size: '1,850',  tag: 'Auto',   clr: '#8B5CF6' },
+    { name: 'Corporate Clients',  size: '640',    tag: 'Manual', clr: '#F97316' },
+    { name: 'Lookalike 1%',       size: '22,000', tag: 'Meta',   clr: '#1877F2' },
+  ];
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div><div style={s.pgCtx}>Step 4 of 6</div><div style={s.pgTitle}>Audience <b>configuration</b></div></div>
+        <Btn variant="primary">+ New segment</Btn>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 18 }}>
+        {segments.map(seg => (
+          <div key={seg.name} style={{ ...s.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: `${seg.clr}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: seg.clr }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>{seg.name}</div>
+                <div style={s.tiny}>{seg.size} people · {seg.tag} segment</div>
+              </div>
+            </div>
+            <Btn variant="secondary" size="sm">Manage</Btn>
+          </div>
+        ))}
+      </div>
+
+      <div style={s.card}>
+        <div style={{ ...s.sect, marginBottom: 14 }}>Default targeting</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+          <V1Input label="Age range" defaultValue="18 – 65" />
+          <V1Input label="Locations" defaultValue="Bangladesh, South Korea" />
+          <V1Input label="Interests" defaultValue="Travel, Aviation, Tourism" />
+          <V1Input label="Excluded audiences" defaultValue="Existing customers" />
+        </div>
+        <Btn variant="primary">Save targeting</Btn>
+      </div>
+    </>
+  );
+}
+
+// ─── Chatbot Settings ────────────────────────────────────────────────
+function ChatbotSettings() {
+  const [active, setActive] = useState(true);
+  const [escalation, setEscalation] = useState('stop');
+  const [keywords, setKeywords] = useState(['refund']);
+  const [kwInput, setKwInput] = useState('');
+  const addKw = () => { if (kwInput.trim()) { setKeywords(p => [...p, kwInput.trim()]); setKwInput(''); } };
+
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div><div style={s.pgCtx}>Step 5 of 6</div><div style={s.pgTitle}>Messenger <b>Chatbot</b></div></div>
+        <Btn variant="primary">Save Settings</Btn>
+      </div>
+
+      {/* Page + toggle */}
+      <div style={{ ...s.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 42, height: 42, background: '#1877F2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, color: '#fff' }}>f</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>Areum Square</div>
+            <div style={s.tiny}>Facebook Page · AI auto-responder</div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 12, color: active ? '#059669' : C.t3, fontWeight: 600 }}>{active ? 'Chatbot Active' : 'Chatbot Off'}</span>
+          <div onClick={() => setActive(v => !v)} style={{ width: 40, height: 22, borderRadius: 100, background: active ? '#6366F1' : '#E2E8F0', position: 'relative', cursor: 'pointer', transition: 'background .2s' }}>
+            <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: active ? 21 : 3, transition: 'left .2s', boxShadow: '0 1px 4px rgba(0,0,0,.2)' }} />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <svg width="14" height="14" fill="none" stroke="#6366F1" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>
+        <span style={{ fontSize: 12, color: C.a1, fontWeight: 600 }}>Auto-reply to Messenger DMs</span>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+        <div style={s.card}>
+          <div style={{ ...s.sect, marginBottom: 6 }}>Bot Instructions</div>
+          <div style={s.tiny}>Tell the bot who it is, what it should do, and any rules to follow.</div>
+          <textarea defaultValue="you are a customer support for skin care products" rows={4} style={{ width: '100%', marginTop: 10, padding: '9px 12px', borderRadius: 9, border: '1.5px solid #E2E8F0', fontSize: 13, color: C.t1, resize: 'none', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+        </div>
+        <div style={s.card}>
+          <div style={{ ...s.sect, marginBottom: 14 }}>Voice & Behaviour</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <V1Select label="Voice & Tone">
+              <option>Friendly & Casual</option><option>Professional</option><option>Formal</option>
+            </V1Select>
+            <V1Select label="Language">
+              <option>English</option><option>Bengali</option><option>Arabic</option>
+            </V1Select>
+            <div>
+              <label style={s.flbl}>Response Delay: <b>10s</b></label>
+              <input type="range" min="0" max="30" defaultValue="10" style={{ width: '100%', accentColor: '#6366F1' }} />
+              <div style={{ ...s.tiny, marginTop: 3 }}>Delay makes responses feel more natural</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+        <div style={s.card}>
+          <label style={s.flbl}>Greeting Message <span style={{ color: C.t3, fontWeight: 400 }}>(optional)</span></label>
+          <textarea defaultValue="Assalamualakum" rows={3} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #E2E8F0', fontSize: 13, color: C.t1, resize: 'none', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+          <div style={{ ...s.tiny, marginTop: 5 }}>Sent once at the start of a new conversation</div>
+        </div>
+        <div style={s.card}>
+          <label style={s.flbl}>Fallback Message <span style={{ color: C.t3, fontWeight: 400 }}>(optional)</span></label>
+          <textarea defaultValue="I'm not sure about that. Let me connect you with someone who can help." rows={3} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #E2E8F0', fontSize: 13, color: C.t1, resize: 'none', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+          <div style={{ ...s.tiny, marginTop: 5 }}>Used when the bot is unsure (only in "always respond" mode)</div>
+        </div>
+      </div>
+
+      <div style={{ ...s.card, marginBottom: 14 }}>
+        <div style={{ ...s.sect, marginBottom: 12 }}>When unsure or unable to answer</div>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+          {[['stop','Stop & notify me (escalate)'],['always','Always try to respond']].map(([v, l]) => (
+            <div key={v} onClick={() => setEscalation(v)} style={{ flex: 1, padding: '12px 14px', borderRadius: 12, border: `2px solid ${escalation === v ? '#6366F1' : '#E2E8F0'}`, background: escalation === v ? '#EEF2FF' : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${escalation === v ? '#6366F1' : '#CBD5E1'}`, background: escalation === v ? '#6366F1' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {escalation === v && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
+              </div>
+              <span style={{ fontSize: 13, fontWeight: escalation === v ? 600 : 400, color: escalation === v ? C.a1 : C.t2 }}>{l}</span>
+            </div>
+          ))}
+        </div>
+
+        <label style={{ ...s.flbl, marginBottom: 6 }}>Escalation Keywords</label>
+        <div style={{ ...s.tiny, marginBottom: 8 }}>Bot stops and notifies you when these words appear</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+          {keywords.map(k => (
+            <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FEF2F2', border: '1.5px solid #FECACA', borderRadius: 100, padding: '3px 10px' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#DC2626' }}>{k}</span>
+              <span onClick={() => setKeywords(p => p.filter(x => x !== k))} style={{ color: '#DC2626', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>×</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input value={kwInput} onChange={e => setKwInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addKw()} placeholder="e.g. refund" style={{ flex: 1, padding: '8px 12px', borderRadius: 9, border: '1.5px solid #E2E8F0', fontSize: 13, outline: 'none', fontFamily: 'inherit' }} />
+          <Btn variant="ghost" onClick={addKw}>Add</Btn>
+        </div>
+      </div>
+
+      <div style={s.card}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <div style={s.sect}>Knowledge Base</div>
+          <Btn variant="secondary" size="sm">Upload</Btn>
+        </div>
+        <div style={s.tiny}>Upload .txt, .csv, or .json files for the bot to reference</div>
+        <div style={{ marginTop: 14, background: '#F8FAFD', border: '2px dashed #C7D2FE', borderRadius: 12, padding: 20, textAlign: 'center' }}>
+          <svg width="24" height="24" fill="none" stroke="#C7D2FE" strokeWidth="1.5" viewBox="0 0 24 24" style={{ marginBottom: 8 }}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" /></svg>
+          <div style={{ fontSize: 12, color: C.t3, fontWeight: 500 }}>No files uploaded yet.</div>
+          <div style={{ ...s.tiny, marginTop: 4 }}>Upload product catalogs, FAQs, or price lists.</div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── Tracking Settings ───────────────────────────────────────────────
+function TrackingSettings() {
+  const [pixelVerified, setPixelVerified] = useState(false);
+  const eventDefs = [
+    { name: 'PageView',              active: true,  desc: 'Fired on every page load' },
+    { name: 'Lead',                  active: true,  desc: 'Form submission or sign-up' },
+    { name: 'Purchase',              active: false, desc: 'Credit purchase completed' },
+    { name: 'ViewContent',           active: true,  desc: 'Campaign or dashboard viewed' },
+    { name: 'InitiateCheckout',      active: false, desc: 'Started credit top-up flow' },
+    { name: 'CompleteRegistration',  active: true,  desc: 'Onboarding completed' },
+  ];
+  const [evtActive, setEvtActive] = useState(eventDefs.map(e => e.active));
+
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div><div style={s.pgCtx}>Step 6 of 6</div><div style={s.pgTitle}>Tracking & <b>pixels</b></div></div>
+        <Btn variant="primary">Save Tracking</Btn>
+      </div>
+
+      {/* Meta Pixel */}
+      <div style={{ ...s.card, marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, background: '#1877F2', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#fff' }}>f</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: C.t1 }}>Meta Pixel (Client-side)</div>
+              <div style={s.tiny}>Tracks website visitor events for ad optimisation & retargeting</div>
+            </div>
+          </div>
+          <V1Badge variant="green" dot>Active</V1Badge>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10, alignItems: 'end' }}>
+          <V1Input label="Pixel ID" defaultValue="1234567890123456" />
+          <Btn variant={pixelVerified ? 'secondary' : 'primary'} onClick={() => setPixelVerified(v => !v)}>
+            {pixelVerified ? '✓ Verified' : 'Verify Pixel'}
+          </Btn>
+        </div>
+      </div>
+
+      {/* Conversions API */}
+      <div style={{ ...s.card, marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, background: '#6366F1', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: C.t1 }}>Conversions API (CAPI)</div>
+              <div style={s.tiny}>Server-side events — works through iOS 14+ restrictions & ad blockers</div>
+            </div>
+          </div>
+          <V1Badge variant="gray">Recommended</V1Badge>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+          <V1Input label="Access Token" defaultValue="EAABs..." />
+          <V1Input label="Test Event Code" defaultValue="TEST12345" />
+        </div>
+        <div style={{ background: '#EEF2FF', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: C.a1 }}>
+          💡 CAPI supplements your Pixel to recover lost events. Zipto sends server events for Lead, Purchase, and CompleteRegistration automatically.
+        </div>
+      </div>
+
+      {/* Standard Events */}
+      <div style={{ ...s.card, marginBottom: 14 }}>
+        <div style={{ ...s.sect, marginBottom: 14 }}>Standard Events</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10 }}>
+          {eventDefs.map((evt, i) => (
+            <div key={evt.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F8FAFD', borderRadius: 10, padding: '10px 14px' }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>{evt.name}</div>
+                <div style={s.tiny}>{evt.desc}</div>
+              </div>
+              <div onClick={() => setEvtActive(p => { const n = [...p]; n[i] = !n[i]; return n; })} style={{ width: 36, height: 20, borderRadius: 100, background: evtActive[i] ? '#6366F1' : '#E2E8F0', position: 'relative', cursor: 'pointer', transition: 'background .2s', flexShrink: 0 }}>
+                <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: evtActive[i] ? 19 : 3, transition: 'left .2s' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* UTM Builder */}
+      <div style={s.card}>
+        <div style={{ ...s.sect, marginBottom: 4 }}>UTM Link Builder</div>
+        <div style={s.tiny}>Auto-tag all links sent through Zipto for campaign attribution</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginTop: 14, marginBottom: 14 }}>
+          <V1Input label="utm_source" defaultValue="facebook" />
+          <V1Input label="utm_medium" defaultValue="social" />
+          <V1Input label="utm_campaign" defaultValue="{campaign_name}" />
+        </div>
+        <div style={{ background: '#F8FAFD', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: C.t2, wordBreak: 'break-all', marginBottom: 12 }}>
+          <span style={{ color: C.t3, fontSize: 10, fontWeight: 700, display: 'block', marginBottom: 4 }}>PREVIEW</span>
+          https://yoursite.com?utm_source=facebook&utm_medium=social&utm_campaign=summer_2026
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Btn variant="primary">Apply to all campaigns</Btn>
+          <Btn variant="secondary">Reset to defaults</Btn>
         </div>
       </div>
     </>
