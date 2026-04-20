@@ -139,7 +139,7 @@ function PlatformSettings() {
   const [active, setActive] = useState([0, 1, 2, 3, 4]);
 
   // Meta connection state
-  const [metaConnected, setMetaConnected] = useState(true);
+  const [metaConnected, setMetaConnected] = useState(false);
   const [selectedPage, setSelectedPage] = useState('kb_aviation');
   const [selectedAd, setSelectedAd] = useState('act_112233445566');
 
