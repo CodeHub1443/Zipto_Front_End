@@ -16,7 +16,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <button className="z-icon-btn" onClick={toggle} title="Toggle Dark Mode" style={{ width: 38, height: 38 }}>
+    <button onClick={toggle} title="Toggle Dark Mode" style={{ width: 42, height: 42, borderRadius: '50%', background: '#F8FAFC', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}>
       {isDark ? (
         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-11.314l.707.707m11.314 11.314l.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
@@ -121,48 +121,65 @@ export function Sidebar({ active = 'dash' }) {
 }
 
 // ─── Header ────────────────────────────────────────────────────────
-export function Header({ userName = "Apon", userProfile = "Last login: 09/19/2023, 15:24 PM", alertCount = 0, onAlertClick }) {
+export function Header({ userName = "Tanvir", userProfile = "KB Aviation · Apr 13, 2026", alertCount = 0, onAlertClick }) {
   return (
-    <div className="z-hdr" style={{ height: 90, borderRadius: 28 }}>
-      <div className="z-hdr-profile">
-        <div style={{
-          width: 54, height: 54, borderRadius: '50%', background: '#FBD38D',
-          overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}>
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Apon" alt="Avatar" width="54" />
+    <div className="z-hdr" style={{ height: 80, borderRadius: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 6px', background: 'transparent' }}>
+      
+      {/* Profile Section */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
+          TB
         </div>
-        <div className="z-hdr-welcome">
-          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--t1)', marginBottom: 2 }}>Welcome back, {userName}</div>
-          <span style={{ fontSize: 11, color: 'var(--t3)' }}>{userProfile}</span>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+            <div style={{ fontSize: 15, color: 'var(--t2)' }}>
+              Welcome back, <b style={{ color: 'var(--t1)' }}>{userName}</b>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#ECFDF5', padding: '3px 8px', borderRadius: 100, fontSize: 10, fontWeight: 700, color: '#10B981' }}>
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981' }} />
+              KB Aviation
+            </div>
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--t3)' }}>{userProfile}</div>
         </div>
       </div>
 
-      <div className="z-search-box" style={{ flex: '0 1 420px', height: 48, borderRadius: 100 }}>
-        <svg width="18" height="18" fill="none" stroke="var(--t3)" strokeWidth="2.5" viewBox="0 0 24 24">
+      {/* Search Bar */}
+      <div className="z-search-box" style={{ flex: '0 1 480px', display: 'flex', alignItems: 'center', background: '#F8FAFC', borderRadius: 100, height: 44, padding: '0 18px', boxShadow: 'none' }}>
+        <svg width="18" height="18" fill="none" stroke="#94A3B8" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginRight: 10 }}>
           <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        <input type="text" placeholder="Search something" style={{ fontSize: 13, color: 'var(--t2)' }} />
+        <input type="text" placeholder="Search anything..." style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: 'var(--t1)' }} />
       </div>
 
-      <div className="z-hdr-actions">
+      {/* Actions */}
+      <div className="z-hdr-actions" style={{ gap: 10 }}>
         <ThemeToggle />
+        
         <button
-          className="z-icon-btn"
           onClick={onAlertClick}
-          style={{ width: 38, height: 38, background: alertCount > 0 ? 'rgba(239,68,68,.08)' : 'var(--bg-shell)', boxShadow: 'var(--shadow-neu-out)', border: alertCount > 0 ? '1px solid rgba(239,68,68,.25)' : 'none' }}
+          style={{ position: 'relative', width: 42, height: 42, borderRadius: '50%', background: '#F8FAFC', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}
         >
-          <svg width="20" height="20" fill="none" stroke={alertCount > 0 ? '#EF4444' : 'currentColor'} strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          {alertCount > 0 && (
-            <div style={{ position: 'absolute', top: 8, right: 8, minWidth: 16, height: 16, background: 'var(--red)', borderRadius: 8, border: '1.5px solid var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: '#fff', padding: '0 3px' }}>
+          {alertCount > 0 ? (
+            <div style={{ position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, background: '#EF4444', borderRadius: 9, border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff', padding: '0 4px' }}>
               {alertCount > 9 ? '9+' : alertCount}
             </div>
+          ) : (
+            <div style={{ position: 'absolute', top: 11, right: 11, width: 6, height: 6, background: '#6366F1', borderRadius: '50%', border: '1.5px solid #F8FAFC' }} />
           )}
-          {alertCount === 0 && (
-            <div style={{ position: 'absolute', top: 10, right: 10, width: 7, height: 7, background: 'var(--red)', borderRadius: '50%', border: '1.5px solid var(--bg-card)' }} />
-          )}
+        </button>
+        
+        <button
+          style={{ height: 42, padding: '0 14px', borderRadius: 100, background: '#F8FAFC', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: '#64748B', fontSize: 13, fontWeight: 600 }}
+        >
+          EN
+          <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
       </div>
     </div>
