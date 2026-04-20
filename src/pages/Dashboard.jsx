@@ -1,205 +1,389 @@
 import React from 'react';
-import { PageShell, NeoCard, RingGauge, IconBadge, Badge, ProgressBar } from '../components/ui';
+import { C, gradHero } from '../tokens';
+import { PageShell } from '../components/ui';
 
-// ─── Proactive alert banner ───────────────────────────────────────────────────
-function AlertBanner({ alert, onDismiss, onNavigate }) {
-  if (!alert) return null;
+// ─── Dashboard-Specific Premium Styles (Local) ──────────────────────
+
+const s = {
+  card: {
+    background: '#FFFFFF',
+    borderRadius: 18,
+    padding: 18,
+    boxShadow: '0 2px 20px rgba(14,25,55,.07)',
+  },
+  cardSm: {
+    background: '#FFFFFF',
+    borderRadius: 14,
+    padding: 14,
+    boxShadow: '0 2px 20px rgba(14,25,55,.07)',
+  },
+  inner: {
+    background: '#F3F6FB',
+    borderRadius: 12,
+    padding: '12px 14px',
+  },
+  innerSm: {
+    background: '#F3F6FB',
+    borderRadius: 9,
+    padding: '9px 11px',
+  },
+  pgCtx: {
+    fontSize: 11,
+    fontWeight: 500,
+    color: '#9BA5B7',
+    letterSpacing: '.07em',
+    textTransform: 'uppercase',
+    marginBottom: 3,
+  },
+  pgTitle: {
+    fontSize: 25,
+    fontWeight: 300,
+    color: '#141921',
+    lineHeight: 1.2,
+  },
+  sect: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#141921',
+  },
+  subl: {
+    fontSize: 10,
+    fontWeight: 700,
+    color: '#9BA5B7',
+    textTransform: 'uppercase',
+    letterSpacing: '.07em',
+  },
+  bignum: {
+    fontSize: 30,
+    fontWeight: 800,
+    color: '#141921',
+    lineHeight: 1,
+  },
+  mednum: {
+    fontSize: 21,
+    fontWeight: 700,
+    color: '#141921',
+  },
+  muted: {
+    fontSize: 12,
+    color: '#9BA5B7',
+  },
+  tiny: {
+    fontSize: 11,
+    color: '#9BA5B7',
+  },
+};
+
+// ─── Local Components (V1 Design) ──────────────────────────────────
+
+function V1IconBadge({ color = 'indigo', size = 38, children }) {
+  const colors = {
+    indigo: '#6366F1', teal: '#06B6D4', purple: '#7C3AED',
+    coral: '#F97316', green: '#22C55E', pink: '#D946EF',
+    blue: '#3B82F6', amber: '#F59E0B', red: '#EF4444',
+  };
   return (
     <div style={{
-      background: alert.bg,
-      border: `1px solid ${alert.color}30`,
-      borderRadius: 14,
-      padding: '12px 16px',
-      marginBottom: 20,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
+      width: size, height: size, borderRadius: '50%',
+      background: colors[color] || color,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
     }}>
-      <div style={{ width: 30, height: 30, borderRadius: 9, background: `${alert.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <svg width="14" height="14" fill="none" stroke={alert.color} strokeWidth="2" viewBox="0 0 24 24">
-          <path d={alert.iconPath} />
-        </svg>
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#141921', marginBottom: 2 }}>{alert.title}</div>
-        <div style={{ fontSize: 12, color: '#5C6678', lineHeight: 1.4 }}>{alert.body}</div>
-      </div>
-      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-        <button
-          onClick={() => { onDismiss(alert.id); onNavigate && onNavigate('sellix'); }}
-          style={{ padding: '6px 14px', background: `linear-gradient(135deg, #818CF8, #6366F1)`, border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, color: '#fff', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 3px 10px rgba(99,102,241,.3)' }}
-        >
-          {alert.actions[0]}
-        </button>
-        <button
-          onClick={() => onDismiss(alert.id)}
-          style={{ width: 28, height: 28, background: `${alert.color}14`, border: 'none', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}
-        >
-          <svg width="12" height="12" fill="none" stroke={alert.color} strokeWidth="2.5" viewBox="0 0 24 24">
-            <path d="M18 6L6 18 M6 6l12 12" />
+      {children}
+    </div>
+  );
+}
+
+function V1ProgressBar({ pct, variant = 'purple', height = 6 }) {
+  const gradBarP = 'linear-gradient(90deg, #8B5CF6, #6366F1)';
+  const gradBarC = 'linear-gradient(90deg, #22D3EE, #06B6D4)';
+  const fills = {
+    purple: gradBarP,
+    cyan:   gradBarC,
+    green:  '#22C55E',
+    orange: '#F97316',
+  };
+  return (
+    <div style={{ height, background: '#E5EAF3', borderRadius: height / 2, overflow: 'hidden' }}>
+      <div style={{
+        height: '100%', width: `${pct}%`, borderRadius: height / 2,
+        background: fills[variant] || fills.purple,
+      }} />
+    </div>
+  );
+}
+
+function V1RingGauge({ size = 110, pct = 0.72, value, label, strokeWidth = 9 }) {
+  const cx = size / 2, cy = size / 2, r = (size - strokeWidth * 2 - 14) / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = circ * pct;
+  const gap  = circ * (1 - pct);
+  const id   = `rg-v1-${size}-${Math.round(pct * 100)}`;
+
+  const ticks = Array.from({ length: 20 }, (_, i) => {
+    const a = (i * 18 - 90) * (Math.PI / 180);
+    const ro = r + strokeWidth + 2, ri = r + strokeWidth + 5;
+    return (
+      <line key={i}
+        x1={cx + ro * Math.cos(a)} y1={cy + ro * Math.sin(a)}
+        x2={cx + ri * Math.cos(a)} y2={cy + ri * Math.sin(a)}
+        stroke="#DDE3F0" strokeWidth="1.4" strokeLinecap="round"
+      />
+    );
+  });
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
+      <defs>
+        <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6366F1" />
+          <stop offset="100%" stopColor="#38BDF8" />
+        </linearGradient>
+      </defs>
+      {ticks}
+      <circle cx={cx} cy={cy} r={r} fill="none"
+        stroke="#E8EDF6" strokeWidth={strokeWidth} strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r={r} fill="none"
+        stroke={`url(#${id})`} strokeWidth={strokeWidth} strokeLinecap="round"
+        strokeDasharray={`${dash.toFixed(1)} ${gap.toFixed(1)}`}
+        transform={`rotate(-90 ${cx} ${cy})`} />
+      <text x={cx} y={cy - (label ? 8 : 0)}
+        textAnchor="middle" dominantBaseline="central"
+        fontSize={size < 90 ? 14 : 18} fontWeight="800" fill="#141921">
+        {value}
+      </text>
+      {label && (
+        <text x={cx} y={cy + 14}
+          textAnchor="middle" dominantBaseline="central"
+          fontSize="11" fill="#9BA5B7">
+          {label}
+        </text>
+      )}
+    </svg>
+  );
+}
+
+function V1Badge({ variant = 'gray', dot, children }) {
+  const variants = {
+    green:  { background: '#ECFDF5', color: '#059669' },
+    blue:   { background: '#EEF2FF', color: '#6366F1' },
+    orange: { background: '#FFF7ED', color: '#EA580C' },
+    red:    { background: '#FEF2F2', color: '#DC2626' },
+    gray:   { background: '#F3F6FB', color: '#5C6678' },
+  };
+  const style = variants[variant] || variants.gray;
+  const dotColors = { green: '#22C55E', orange: '#F97316', red: '#EF4444', blue: '#6366F1' };
+  
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 9px',
+      borderRadius: 100, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap', ...style
+    }}>
+      {dot && (
+        <span style={{
+          width: 6, height: 6, borderRadius: '50%',
+          background: dotColors[dot] || dotColors[variant] || '#9BA5B7',
+          display: 'inline-block', flexShrink: 0,
+        }} />
+      )}
+      {children}
+    </span>
+  );
+}
+
+// ─── Local Sub-components ───────────────────────────────────────────
+
+function MetricCard({ label, value, badge, barVariant, barPct, iconColor, iconPath }) {
+  return (
+    <div style={s.card}>
+      <div className="row ac jb mb8" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <span style={s.muted}>{label}</span>
+        <V1IconBadge color={iconColor} size={30}>
+          <svg width="13" height="13" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+            <path d={iconPath} />
           </svg>
-        </button>
+        </V1IconBadge>
+      </div>
+      <div style={{ ...s.bignum, marginBottom: 6 }}>{value}</div>
+      <div className="row ac gap6 mb8" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>{badge}</div>
+      <V1ProgressBar pct={barPct} variant={barVariant} />
+    </div>
+  );
+}
+
+function CampaignRow({ name, sub, status }) {
+  const variants = { Live: 'green', 'Sched.': 'orange', Draft: 'gray' };
+  return (
+    <div style={{ ...s.innerSm, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 26, height: 26, background: '#1877F2', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 700 }}>f</div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 500 }}>{name}</div>
+          <div style={s.tiny}>{sub}</div>
+        </div>
+      </div>
+      <V1Badge variant={variants[status]}>{status}</V1Badge>
+    </div>
+  );
+}
+
+function InboxItem({ name, time, message, badges }) {
+  return (
+    <div style={{ ...s.innerSm, cursor: 'pointer' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <span style={{ fontSize: 13, fontWeight: 500 }}>{name}</span>
+        <span style={s.tiny}>{time}</span>
+      </div>
+      <div style={{ fontSize: 12, color: '#5C6678', marginBottom: 5 }}>{message}</div>
+      <div style={{ display: 'flex', gap: 4 }}>
+        {badges.map(([v, l]) => <V1Badge key={l} variant={v}>{l}</V1Badge>)}
       </div>
     </div>
   );
 }
 
+// ─── Main Dashboard Page ─────────────────────────────────────────────
+
 export default function Dashboard({ alerts = [], onDismissAlert, onNavigate, alertCount, onAlertClick }) {
-  const topAlert = alerts.find(a => !a.dismissed);
-
   return (
-    <PageShell active="dash" alertCount={alertCount} onAlertClick={onAlertClick}>
-      <div style={{ padding: '0 10px', display: 'flex', flexDirection: 'column', gap: 30 }}>
+    <PageShell active="dashboard" onNavigate={onNavigate} alertCount={alertCount} onAlertClick={onAlertClick}>
+      <div style={{ padding: '20px 22px', height: '100%', overflow: 'hidden' }}>
 
-        {/* Proactive alert banner — shows top undismissed alert */}
-        <AlertBanner alert={topAlert} onDismiss={onDismissAlert} onNavigate={onNavigate} />
-
-        {/* Page Titles */}
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--t3)', letterSpacing: 1, marginBottom: 8 }}>Overview</div>
-          <div style={{ fontSize: 44, fontWeight: 700, color: 'var(--t1)', letterSpacing: -1 }}>Marketing <span style={{ fontWeight: 300 }}>Zipto Analysis</span></div>
+        {/* Page header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div>
+            <div style={s.pgCtx}>Overview</div>
+            <div style={s.pgTitle}>Your business <b style={{ fontWeight: 800 }}>at a glance</b></div>
+          </div>
+          <button style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '8px 18px',
+            borderRadius: 11, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none', whiteSpace: 'nowrap',
+            background: 'linear-gradient(135deg, #818CF8, #6366F1)', color: '#fff', boxShadow: '0 4px 14px rgba(99,102,241,.28)'
+          }}>
+            <svg width="13" height="13" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            New Campaign
+          </button>
         </div>
 
-        {/* Top Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 2fr 1fr', gap: 30 }}>
-          {/* Card 1: Main Gauge */}
-          <NeoCard>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 20 }}>
-              <RingGauge size={180} pct={0.75} value="92%" label="PERFORMANCE" color="var(--purple)" />
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--t2)' }}>Optimized ROI</div>
-                <div style={{ fontSize: 11, color: 'var(--t3)', marginTop: 4 }}>+12.4% from last week</div>
+        {/* 4 Metric cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11, marginBottom: 12 }}>
+          <MetricCard label="Sales this week" value="$4,240" barVariant="purple" barPct={68} iconColor="indigo" iconPath="M12 1v22 M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"
+            badge={<><V1Badge variant="green">▲ 12.4%</V1Badge><span style={s.tiny}>vs last week</span></>} />
+          <MetricCard label="New leads" value="189" barVariant="cyan" barPct={54} iconColor="teal" iconPath="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2 M12 11a4 4 0 100-8 4 4 0 000 8z"
+            badge={<><V1Badge variant="green">▲ 8.1%</V1Badge><span style={s.tiny}>vs last week</span></>} />
+          <MetricCard label="Total reach" value="224K" barVariant="purple" barPct={82} iconColor="purple" iconPath="M12 2a10 10 0 100 20A10 10 0 0012 2z M2 12h20 M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+            badge={<><V1Badge variant="green">▲ 15.2%</V1Badge><span style={s.tiny}>this week</span></>} />
+          <MetricCard label="Active campaigns" value="8" barVariant="orange" barPct={40} iconColor="coral" iconPath="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"
+            badge={<V1Badge variant="orange" dot="orange">Live now</V1Badge>} />
+        </div>
+
+        {/* 3-col layout */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr 0.85fr', gap: 12, height: 'calc(100% - 208px)' }}>
+
+          {/* Col 1: Ring gauge + campaigns */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ ...s.card, display: 'flex', alignItems: 'center', gap: 14, padding: 16 }}>
+              <V1RingGauge size={112} pct={0.72} value="$4K" strokeWidth={8} />
+              <div style={{ flex: 1 }}>
+                <div style={{ ...s.subl, marginBottom: 8 }}>WEEKLY PERFORMANCE</div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#8B5CF6', display: 'inline-block' }} />
+                    <span style={s.tiny}>Sales target</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#141921', marginLeft: 'auto' }}>68%</span>
+                  </div>
+                  <V1ProgressBar pct={68} variant="purple" height={4} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, marginTop: 8 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22D3EE', display: 'inline-block' }} />
+                    <span style={s.tiny}>Lead target</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#141921', marginLeft: 'auto' }}>45%</span>
+                  </div>
+                  <V1ProgressBar pct={45} variant="cyan" height={4} />
+                </div>
               </div>
             </div>
-          </NeoCard>
-
-          {/* Card 2: AI Status */}
-          <NeoCard>
-            <div className="row jb ac mb20">
-              <div style={{ maxWidth: 160 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--t1)', lineHeight: 1.4 }}>Let Zipto AI automate your Sales Park</div>
+            <div style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 8, flex: 1, padding: 16, overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={s.sect}>Active campaigns</div>
+                <V1Badge variant="green" dot="green">8 live</V1Badge>
               </div>
-              <div className="row gap8">
-                {[1,2,3].map(i => (
-                  <div key={i} style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-neu-out)' }}>
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Bot${i}`} alt="AI" width="44" />
+              <CampaignRow name="Summer Sale Promo" sub="14.2K reach" status="Live" />
+              <CampaignRow name="Seoul–Dubai Route" sub="Starts in 3 days" status="Sched." />
+              <CampaignRow name="Loyalty Program" sub="Draft · Pending" status="Draft" />
+            </div>
+          </div>
+
+          {/* Col 2: Inbox */}
+          <div style={{ ...s.card, padding: 16, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <div style={s.sect}>Sales Inbox</div>
+              <V1Badge variant="red">5 new</V1Badge>
+            </div>
+            <div style={{ ...s.inner, padding: '10px 12px', marginBottom: 10 }}>
+              <div style={{ display: 'flex', gap: 16 }}>
+                {[
+                  { color: 'green', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', value: '47', label: 'AI replies' },
+                  { color: 'teal',  icon: 'M12 2a10 10 0 100 20A10 10 0 0012 2z M12 6v6l4 2', value: '3.2h', label: 'saved' },
+                ].map(({ color, icon, value, label }) => (
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <V1IconBadge color={color} size={24}>
+                      <svg width="11" height="11" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><path d={icon} /></svg>
+                    </V1IconBadge>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 800 }}>{value}</div>
+                      <div style={s.tiny}>{label}</div>
+                    </div>
                   </div>
                 ))}
-                <IconBadge size={44}><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M7 16V4m0 12l-3-3m3 3l3-3M17 8v12m0-12l-3 3m3-3l3-3" /></svg></IconBadge>
               </div>
             </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <InboxItem name="Sarah Johnson" time="2m" message="Is this product still available?" badges={[['orange','WARM'],['gray','New Customer']]} />
+              <InboxItem name="Ahmed Rahman" time="15m" message="Delivery options?" badges={[['red','HOT'],['blue','VIP']]} />
+              <InboxItem name="Fatima Ali" time="1h" message="Bulk discount?" badges={[['orange','WARM']]} />
+            </div>
+            <button style={{
+              width: '100%', justifyContent: 'center', marginTop: 10, fontSize: 12,
+              display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 18px',
+              borderRadius: 11, fontWeight: 600, cursor: 'pointer', border: 'none', whiteSpace: 'nowrap',
+              background: '#F3F6FB', color: '#5C6678'
+            }}>View all conversations</button>
+          </div>
 
-            <div className="z-div" />
-
-            <div className="row jb" style={{ marginTop: 20 }}>
-              {[
-                 { icon: 'M13 10V3L4 14h7v7l9-11h-7z', val: '4,240', lbl: 'Leads generated', color: 'var(--cyan)' },
-                 { icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6', val: '+24%', lbl: 'Conversion lift', color: 'var(--purple)' },
-                 { icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', val: '128 times', lbl: 'AI responses', color: 'var(--a1)' },
-              ].map((s, i) => (
-                <div key={i} className="row ac gap12" style={{ flex: 1 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: `0 4px 12px ${s.color}44` }}>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d={s.icon} /></svg>
+          {/* Col 3: AI rec + credits + time */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ ...s.card, background: gradHero, border: 'none', padding: 16 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.09em', marginBottom: 7 }}>SELLIX RECOMMENDS</div>
+              <div style={{ fontSize: 13, color: '#fff', fontWeight: 500, lineHeight: 1.55, marginBottom: 12 }}>Boost "Summer Sale" — 3× avg engagement.</div>
+              <div style={{ background: 'rgba(255,255,255,.18)', color: '#fff', border: '1px solid rgba(255,255,255,.25)', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'inline-block' }}>
+                Boost now →
+              </div>
+            </div>
+            <div style={{ ...s.card, padding: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={s.sect}>Credits</div>
+                <V1Badge variant="blue">Pro</V1Badge>
+              </div>
+              <div style={{ ...s.mednum, marginBottom: 4 }}>1,240 <span style={{ fontSize: 12, fontWeight: 400, color: '#9BA5B7' }}>credits</span></div>
+              <V1ProgressBar pct={38} variant="purple" />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 }}>
+                <span style={s.tiny}>760 / 2,000 used</span>
+                <span style={{ fontSize: 12, color: '#6366F1', fontWeight: 600, cursor: 'pointer' }}>Top up</span>
+              </div>
+            </div>
+            <div style={{ ...s.card, padding: 16 }}>
+              <div style={{ ...s.sect, marginBottom: 8 }}>Best post time</div>
+              <div style={{ display: 'flex', gap: 7 }}>
+                {[['TUE','6–8pm'],['THU','7–9pm']].map(([day, time]) => (
+                  <div key={day} style={{ ...s.inner, flex: 1, textAlign: 'center', padding: 9 }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: '#6366F1', marginBottom: 2 }}>{day}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{time}</div>
                   </div>
-                  <div>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--t1)' }}>{s.val}</div>
-                    <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--t3)', textTransform: 'uppercase' }}>{s.lbl}</div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <div style={{ ...s.tiny, marginTop: 7 }}>Weekday evenings peak</div>
             </div>
-          </NeoCard>
-
-          {/* Card 3: Summary */}
-          <NeoCard>
-            <div className="z-sect mb16">Summary</div>
-            <div className="col gap16">
-              {[
-                { lbl: 'Campaign Status', val: '80%', color: 'var(--cyan)' },
-                { lbl: 'Engagement Rate', val: '64%', color: 'var(--purple)' },
-              ].map(x => (
-                <div key={x.lbl}>
-                  <div className="row jb mb6">
-                    <span className="z-tiny" style={{ fontWeight: 600 }}>{x.lbl}</span>
-                    <span className="z-tiny" style={{ fontWeight: 800, color: 'var(--t1)' }}>{x.val}</span>
-                  </div>
-                  <ProgressBar pct={parseInt(x.val)} color={x.color} height={6} />
-                </div>
-              ))}
-            </div>
-          </NeoCard>
-        </div>
-
-        {/* Bottom Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 30 }}>
-          <NeoCard>
-             <div className="row jb ac mb20">
-               <div className="z-sect" style={{ fontSize: 18 }}>Detailed Performance</div>
-               <IconBadge size={32}><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><path d="M22 6l-10 7L2 6" /></svg></IconBadge>
-             </div>
-
-             <div style={{ display: 'flex', gap: 30, marginBottom: 40 }}>
-                <RingGauge size={140} pct={0.68} value="12.4" label="LEADS / HR" color="var(--a1)" />
-                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-                   {[
-                     { l: 'Avg CPC', v: '$0.42' }, { l: 'Peak CTR', v: '8.4%' },
-                     { l: 'Ad Spend', v: '$1,240' }, { l: 'Avg ROAS', v: '4.2x' }
-                   ].map(st => (
-                     <div key={st.l} className="row jb ac" style={{ padding: '10px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                       <span style={{ fontSize: 12, color: 'var(--t3)' }}>{st.l}</span>
-                       <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)' }}>{st.v}</span>
-                     </div>
-                   ))}
-                </div>
-             </div>
-
-             <div className="z-sect mb16">Status</div>
-             <div className="row gap20">
-                <div style={{ flex: 1.5, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 15 }}>
-                   {[
-                     { icon: 'A', val: '47,819', lbl: 'Total Reach', color: 'var(--red)' },
-                     { icon: 'B', val: '18°C', lbl: 'Optimal Temp', color: 'var(--green)' },
-                     { icon: 'C', val: '64%', lbl: 'Budget used', color: 'var(--green)' },
-                   ].map((it, idx) => (
-                      <div key={idx} style={{ background: 'var(--bg-shell)', borderRadius: 20, padding: '16px 20px', boxShadow: 'var(--shadow-neu-out)' }}>
-                         <div style={{ width: 24, height: 24, borderRadius: '50%', background: it.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 15, color: '#fff', fontSize: 10, fontWeight: 900 }}>{it.icon}</div>
-                         <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--t1)' }}>{it.val}</div>
-                         <div style={{ fontSize: 10, color: 'var(--t3)', fontWeight: 600, marginTop: 2 }}>{it.lbl}</div>
-                      </div>
-                   ))}
-                </div>
-                <div style={{ flex: 1, background: 'var(--bg-shell)', borderRadius: 20, padding: 16, boxShadow: 'var(--shadow-neu-out)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                   <svg width="100%" height="80" viewBox="0 0 100 40">
-                      <path d="M0 35 L20 15 L40 25 L60 5 L80 15 L100 30" fill="none" stroke="var(--cyan)" strokeWidth="3" strokeLinecap="round" />
-                      <circle cx="60" cy="5" r="4" fill="var(--cyan)" stroke="var(--bg-shell)" strokeWidth="2" />
-                   </svg>
-                </div>
-             </div>
-          </NeoCard>
-
-          <NeoCard>
-            <div className="z-sect mb20">Campaign History</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 20 }}>
-               <span style={{ fontSize: 32, fontWeight: 800, color: 'var(--t1)' }}>30%</span>
-               <span style={{ fontSize: 12, color: 'var(--t3)' }}>Latest lift <br/> 3 Hours Ago</span>
-            </div>
-            <div className="z-div" />
-            <div className="col gap14" style={{ marginTop: 20 }}>
-               {[
-                 { date: 'Sep 19', name: 'Summer Sale', lift: '+14%', color: 'var(--cyan)' },
-                 { date: 'Sep 18', name: 'Brand Launch', lift: '+28%', color: 'var(--purple)' },
-                 { date: 'Sep 15', name: 'Influencer Collab', lift: '+9%', color: 'var(--green)' },
-               ].map((c, i) => (
-                 <div key={i} className="row jb ac">
-                    <div>
-                       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)' }}>{c.name}</div>
-                       <div style={{ fontSize: 11, color: 'var(--t3)' }}>{c.date}</div>
-                    </div>
-                    <Badge variant="blue">{c.lift}</Badge>
-                 </div>
-               ))}
-            </div>
-          </NeoCard>
+          </div>
         </div>
       </div>
     </PageShell>
