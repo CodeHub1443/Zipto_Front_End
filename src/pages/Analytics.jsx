@@ -364,68 +364,66 @@ export default function Analytics({ alertCount, onAlertClick, onNavigate }) {
 }
 
 function FullFunnelCard() {
+  const [expanded, setExpanded] = useState('Awareness');
+
   const sections = [
-    {
-      title: 'Awareness',
-      data: [
-        { label: 'Impressions', m1: '1.2M', m2: '1.0M', m3: '0.9M' },
-        { label: 'Reach', m1: '450K', m2: '410K', m3: '380K' },
-        { label: 'Frequency', m1: '2.4x', m2: '2.5x', m3: '2.6x' }
-      ]
-    },
-    {
-      title: 'Engagement',
-      data: [
-        { label: 'Eng. Rate', m1: '6.4%', m2: '6.1%', m3: '5.8%' },
-        { label: 'Likes/Saves', m1: '24.1K', m2: '21K', m3: '18K' },
-        { label: 'Shares', m1: '1.2K', m2: '1.1K', m3: '0.9K' }
-      ]
-    },
-    {
-      title: 'Consideration',
-      data: [
-        { label: 'Profile Visits', m1: '15.9K', m2: '14K', m3: '12K' },
-        { label: 'Link Clicks', m1: '8.2K', m2: '7.5K', m3: '6.2K' },
-        { label: 'Inquiries', m1: '420', m2: '380', m3: '310' }
-      ]
-    },
-    {
-      title: 'Retention',
-      data: [
-        { label: 'Repeat Cust.', m1: '38.4%', m2: '36%', m3: '34%' },
-        { label: 'Churn Rate', m1: '1.2%', m2: '1.3%', m3: '1.5%' },
-        { label: 'NPS Score', m1: '78', m2: '76', m3: '74' }
-      ]
-    }
+    { title: 'Awareness',     dot: '#6366F1', metrics: [['Impressions','1.2M'],['Reach','450K'],['Frequency','2.4x']] },
+    { title: 'Engagement',    dot: '#818CF8', metrics: [['Eng. Rate','6.4%'],['Likes/Saves','24.1K'],['Shares','1.2K']] },
+    { title: 'Consideration', dot: '#06B6D4', metrics: [['Profile Visits','15.9K'],['Link Clicks','8.2K'],['Inquiries','420']] },
+    { title: 'Retention',     dot: '#22C55E', metrics: [['Repeat Cust.','38.4%'],['Churn Rate','1.2%'],['NPS Score','78']] },
   ];
 
   return (
-    <div style={{ ...s.card, padding: 18 }}>
-      <div style={{ ...s.sect, marginBottom: 14 }}>Full Funnel Analysis</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {sections.map((sec, idx) => (
-          <div key={sec.title}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-               <span style={{ fontSize: 10, fontWeight: 800, color: '#6366F1', letterSpacing: '.05em' }}>{sec.title.toUpperCase()}</span>
-               <div style={{ display: 'flex', gap: 14 }}>
-                  {['M1','M2','M3'].map(m => <span key={m} style={{ fontSize: 9, fontWeight: 700, color: '#9BA5B7', width: 32, textAlign: 'center' }}>{m}</span>)}
-               </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {sec.data.map(row => (
-                <div key={row.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 12, color: '#5C6678', fontWeight: 500 }}>{row.label}</span>
-                  <div style={{ display: 'flex', gap: 14 }}>
-                    {[row.m1, row.m2, row.m3].map((val, i) => (
-                      <span key={i} style={{ fontSize: 11, fontWeight: 600, color: i === 0 ? '#141921' : '#9BA5B7', width: 32, textAlign: 'center' }}>{val}</span>
-                    ))}
-                  </div>
+    <div style={{ ...s.card, padding: 0, overflow: 'hidden', flex: 1 }}>
+      <div style={{ padding: '15px 18px', borderBottom: '1px solid #F1F5F9' }}>
+         <div style={s.sect}>Full Funnel Analysis</div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {sections.map(sec => {
+          const isFull = expanded === sec.title;
+          return (
+            <div key={sec.title} style={{ borderBottom: '1px solid #F1F5F9' }}>
+              <div 
+                onClick={() => setExpanded(isFull ? null : sec.title)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 18px', cursor: 'pointer', background: isFull ? '#F8FAFD' : 'white', transition: 'background 0.2s' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: sec.dot }} />
+                  <span style={{ fontSize: 12, fontWeight: 700, color: isFull ? '#141921' : '#5C6678', letterSpacing: '.02em' }}>{sec.title.toUpperCase()}</span>
                 </div>
-              ))}
+                <div style={{ fontSize: 16, color: '#9BA5B7', fontWeight: 300, transition: 'transform 0.3s', transform: isFull ? 'rotate(45deg)' : 'rotate(0deg)' }}>+</div>
+              </div>
+              
+              <div style={{ 
+                maxHeight: isFull ? 300 : 0, 
+                overflow: 'hidden', 
+                transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                background: 'white'
+              }}>
+                <div style={{ padding: '4px 18px 18px', opacity: isFull ? 1 : 0, transition: 'opacity 0.3s' }}>
+                   {/* Month Bars from Image */}
+                   <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                      {['M1','M2','M3'].map((m) => (
+                        <div key={m} style={{ flex: 1 }}>
+                           <div style={{ height: 3, background: sec.dot, borderRadius: 100, marginBottom: 5, opacity: 0.7 }} />
+                           <div style={{ textAlign: 'center', fontSize: 9, fontWeight: 700, color: '#9BA5B7' }}>{m}</div>
+                        </div>
+                      ))}
+                   </div>
+                   {/* Metrics List */}
+                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {sec.metrics.map(([l, v]) => (
+                         <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 11, color: '#5C6678', fontWeight: 500 }}>{l}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#141921' }}>{v}</span>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+              </div>
             </div>
-            {idx < sections.length - 1 && <div style={{ height: 1, background: '#F1F5F9', marginTop: 12 }} />}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
