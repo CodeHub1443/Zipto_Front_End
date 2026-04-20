@@ -145,7 +145,7 @@ export function Header({ userName = "Tanvir", userProfile = "KB Aviation · Apr 
       </div>
 
       {/* Search Bar */}
-      <div style={{ flex: '0 1 480px', display: 'flex', alignItems: 'center', background: '#F0F4F8', borderRadius: 100, height: 44, padding: '0 20px' }}>
+      <div style={{ flex: '0 1 480px', display: 'flex', alignItems: 'center', background: '#FFFFFF', border: '1.5px solid #E2E8F0', borderRadius: 100, height: 44, padding: '0 20px' }}>
         <svg width="16" height="16" fill="none" stroke="#8A94A6" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginRight: 12 }}>
           <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
