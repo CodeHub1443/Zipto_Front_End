@@ -145,11 +145,11 @@ export function Header({ userName = "Tanvir", userProfile = "KB Aviation · Apr 
       </div>
 
       {/* Search Bar */}
-      <div className="z-search-box" style={{ flex: '0 1 480px', display: 'flex', alignItems: 'center', background: '#F8FAFC', borderRadius: 100, height: 44, padding: '0 18px', boxShadow: 'none' }}>
-        <svg width="18" height="18" fill="none" stroke="#94A3B8" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginRight: 10 }}>
+      <div style={{ flex: '0 1 480px', display: 'flex', alignItems: 'center', background: '#F4F7FB', borderRadius: 100, height: 44, padding: '0 20px' }}>
+        <svg width="16" height="16" fill="none" stroke="#A0ABBB" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginRight: 12 }}>
           <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        <input type="text" placeholder="Search anything..." style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: 'var(--t1)' }} />
+        <input type="text" placeholder="Search anything..." style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 13, color: '#A0ABBB', fontWeight: 500 }} />
       </div>
 
       {/* Actions */}
