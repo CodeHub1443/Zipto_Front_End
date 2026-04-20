@@ -265,14 +265,6 @@ function PlatformSettings() {
         </div>
       )}
 
-              <div style={{ fontSize: 12, fontWeight: 500, color: C.t2 }}>Request connector</div>
-              <div style={s.tiny}>Need another?</div>
-            </div>
-          </div>
-          <Btn variant="ghost" size="sm" style={{ justifyContent: 'center', width: '100%' }}>Request →</Btn>
-        </div>
-      </div>
-
       {/* Posting schedule */}
       <div style={{ ...s.card }}>
         <div style={{ ...s.sect, marginBottom: 14 }}>Default posting schedule</div>
