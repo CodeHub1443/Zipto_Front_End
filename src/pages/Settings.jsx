@@ -138,6 +138,21 @@ function PlatformSettings() {
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const [active, setActive] = useState([0, 1, 2, 3, 4]);
 
+  // Meta connection state
+  const [metaConnected, setMetaConnected] = useState(true);
+  const [selectedPage, setSelectedPage] = useState('kb_aviation');
+  const [selectedAd, setSelectedAd] = useState('act_112233445566');
+
+  const fbPages = [
+    { id: 'kb_aviation',  name: 'KB Aviation',  followers: '13,497', category: 'Travel & Transportation' },
+    { id: 'areum_square', name: 'Areum Square',  followers: '8,210',  category: 'Skin Care' },
+    { id: 'test_page',    name: 'My Test Page',  followers: '104',    category: 'Uncategorized' },
+  ];
+  const adAccounts = [
+    { id: 'act_112233445566', name: 'KB Aviation Ads', currency: 'USD' },
+    { id: 'act_998877665544', name: 'Areum Square Promotions', currency: 'KRW' },
+  ];
+
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
@@ -149,25 +164,76 @@ function PlatformSettings() {
       </div>
 
       {/* Connected FB card */}
-      <div style={{ background: C.white, border: '2px solid #C7D2FE', borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: '0 2px 20px rgba(14,25,55,.07)' }}>
+      <div style={{ background: C.white, border: `2px solid ${metaConnected ? '#C7D2FE' : '#E2E8F0'}`, borderRadius: 16, padding: 16, marginBottom: metaConnected ? 0 : 14, boxShadow: '0 2px 20px rgba(14,25,55,.07)', borderBottomLeftRadius: metaConnected ? 0 : 16, borderBottomRightRadius: metaConnected ? 0 : 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, background: '#1877F2', borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, fontWeight: 700, color: '#fff' }}>f</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 600, color: C.t1, marginBottom: 2 }}>Meta / Facebook</div>
-              <div style={s.tiny}>KB Aviation · 13,497 followers · Connected Apr 6, 2026</div>
+              <div style={s.tiny}>{metaConnected ? 'KB Aviation · 13,497 followers · Connected Apr 6, 2026' : 'Not connected'}</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <V1Badge variant="green" dot>Connected</V1Badge>
-            <Btn variant="secondary" size="sm">Sync now</Btn>
-            <Btn variant="danger" size="sm">Disconnect</Btn>
+            {metaConnected
+              ? <><V1Badge variant="green" dot>Connected</V1Badge><Btn variant="secondary" size="sm">Sync now</Btn><Btn variant="danger" size="sm" onClick={() => setMetaConnected(false)}>Disconnect</Btn></>
+              : <Btn variant="primary" size="sm" onClick={() => setMetaConnected(true)}>Connect Meta</Btn>
+            }
           </div>
         </div>
       </div>
 
-      {/* 3×3 platform grid (5 platforms + 1 request = 6 cards, 3 per row) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18 }}>
+      {/* ── Page & Ad Account selector — only shown when Meta is connected ── */}
+      {metaConnected && (
+        <div style={{ background: '#FAFBFF', border: '2px solid #C7D2FE', borderTop: 'none', borderRadius: '0 0 16px 16px', padding: '18px 20px', marginBottom: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            
+            {/* Facebook Page selector */}
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Facebook Page</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {fbPages.map(pg => (
+                  <div key={pg.id} onClick={() => setSelectedPage(pg.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 12, border: `2px solid ${selectedPage === pg.id ? '#6366F1' : '#E2E8F0'}`, background: selectedPage === pg.id ? '#EEF2FF' : '#fff', cursor: 'pointer', transition: 'all .15s' }}>
+                    <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${selectedPage === pg.id ? '#6366F1' : '#CBD5E1'}`, background: selectedPage === pg.id ? '#6366F1' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {selectedPage === pg.id && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: selectedPage === pg.id ? C.a1 : C.t1 }}>{pg.name}</div>
+                      <div style={s.tiny}>{pg.followers} followers · {pg.category}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Ad Account selector */}
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Ad Account</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+                {adAccounts.map(acc => (
+                  <div key={acc.id} onClick={() => setSelectedAd(acc.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 12, border: `2px solid ${selectedAd === acc.id ? '#6366F1' : '#E2E8F0'}`, background: selectedAd === acc.id ? '#EEF2FF' : '#fff', cursor: 'pointer', transition: 'all .15s' }}>
+                    <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${selectedAd === acc.id ? '#6366F1' : '#CBD5E1'}`, background: selectedAd === acc.id ? '#6366F1' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {selectedAd === acc.id && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: selectedAd === acc.id ? C.a1 : C.t1 }}>{acc.name}</div>
+                      <div style={s.tiny}>{acc.id} · {acc.currency}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: '#EEF2FF', borderRadius: 10, padding: '9px 12px', fontSize: 11, color: C.a1 }}>
+                💡 Your selected page and ad account will be used for all Zipto campaigns by default.
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <Btn variant="primary" style={{ width: '100%', justifyContent: 'center' }}>Save selection</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3×3 platform grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18, marginTop: metaConnected ? 14 : 0 }}>
         {platforms.map(({ id, bg, label, name, sub, soon }) => (
           <div key={id} style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
