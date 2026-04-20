@@ -138,10 +138,13 @@ function PlatformSettings() {
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const [active, setActive] = useState([0, 1, 2, 3, 4]);
 
-  // Meta connection state
+  // Meta state
   const [metaConnected, setMetaConnected] = useState(false);
-  const [selectedPage, setSelectedPage] = useState('kb_aviation');
-  const [selectedAd, setSelectedAd] = useState('act_112233445566');
+  const [showModal, setShowModal] = useState(false);
+  const [draftPage, setDraftPage] = useState('kb_aviation');
+  const [draftAd, setDraftAd] = useState('act_112233445566');
+  const [savedPage, setSavedPage] = useState(null);
+  const [savedAd, setSavedAd] = useState(null);
 
   const fbPages = [
     { id: 'kb_aviation',  name: 'KB Aviation',  followers: '13,497', category: 'Travel & Transportation' },
@@ -153,6 +156,25 @@ function PlatformSettings() {
     { id: 'act_998877665544', name: 'Areum Square Promotions', currency: 'KRW' },
   ];
 
+  const openModal = () => {
+    setDraftPage(savedPage?.id || 'kb_aviation');
+    setDraftAd(savedAd?.id || 'act_112233445566');
+    setShowModal(true);
+  };
+
+  const handleSave = () => {
+    setSavedPage(fbPages.find(p => p.id === draftPage));
+    setSavedAd(adAccounts.find(a => a.id === draftAd));
+    setMetaConnected(true);
+    setShowModal(false);
+  };
+
+  const handleDisconnect = () => {
+    setMetaConnected(false);
+    setSavedPage(null);
+    setSavedAd(null);
+  };
+
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
@@ -163,25 +185,40 @@ function PlatformSettings() {
         <span style={{ fontSize: 12, color: C.a1, fontWeight: 500, cursor: 'pointer' }}>Need help?</span>
       </div>
 
-      {/* 3×3 platform grid — Meta is the first card */}
+      {/* 3×3 platform grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18 }}>
 
         {/* Meta / Facebook card */}
-        <div style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 12, padding: '14px 16px', border: metaConnected ? '2px solid #C7D2FE' : '2px solid transparent' }}>
+        <div style={{ ...s.card, display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 16px', border: metaConnected ? '2px solid #C7D2FE' : '2px solid transparent' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, background: '#1877F2', borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#fff', flexShrink: 0 }}>f</div>
-            <div>
+            <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>Meta / Facebook</div>
-              <div style={s.tiny}>{metaConnected ? 'Connected' : 'Not connected'}</div>
+              <div style={s.tiny}>{metaConnected ? 'Connected' : 'Max 1 account'}</div>
             </div>
-            {metaConnected && <V1Badge variant="green" dot style={{ marginLeft: 'auto' }}>✓</V1Badge>}
+            {metaConnected && <V1Badge variant="green" dot></V1Badge>}
           </div>
+
+          {/* Show selected page + ad account when connected */}
+          {metaConnected && savedPage && (
+            <div style={{ background: '#F8FAFD', borderRadius: 9, padding: '8px 10px', fontSize: 11 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                <span style={{ color: C.t3, fontWeight: 600 }}>Page</span>
+                <span style={{ color: C.t1, fontWeight: 700 }}>{savedPage.name}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: C.t3, fontWeight: 600 }}>Ad Acc.</span>
+                <span style={{ color: C.t1, fontWeight: 700 }}>{savedAd?.name}</span>
+              </div>
+            </div>
+          )}
+
           {metaConnected
             ? <div style={{ display: 'flex', gap: 6 }}>
-                <Btn variant="secondary" size="sm" style={{ flex: 1, justifyContent: 'center' }}>Sync</Btn>
-                <Btn variant="danger" size="sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setMetaConnected(false)}>Disconnect</Btn>
+                <Btn variant="secondary" size="sm" style={{ flex: 1, justifyContent: 'center' }} onClick={openModal}>Edit</Btn>
+                <Btn variant="danger" size="sm" style={{ flex: 1, justifyContent: 'center' }} onClick={handleDisconnect}>Disconnect</Btn>
               </div>
-            : <Btn variant="primary" size="sm" style={{ justifyContent: 'center', width: '100%' }} onClick={() => setMetaConnected(true)}>Connect</Btn>
+            : <Btn variant="primary" size="sm" style={{ justifyContent: 'center', width: '100%' }} onClick={openModal}>Connect</Btn>
           }
         </div>
 
@@ -215,51 +252,63 @@ function PlatformSettings() {
         </div>
       </div>
 
-      {/* ── Page & Ad Account selector — appears below grid only when Meta is connected ── */}
-      {metaConnected && (
-        <div style={{ ...s.card, marginBottom: 18, border: '2px solid #C7D2FE', background: '#FAFBFF' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: C.t1, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 20, height: 20, background: '#1877F2', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff' }}>f</div>
-            Meta Account Setup
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-            {/* Facebook Page selector */}
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Facebook Page</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {fbPages.map(pg => (
-                  <div key={pg.id} onClick={() => setSelectedPage(pg.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 12, border: `2px solid ${selectedPage === pg.id ? '#6366F1' : '#E2E8F0'}`, background: selectedPage === pg.id ? '#EEF2FF' : '#fff', cursor: 'pointer', transition: 'all .15s' }}>
-                    <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${selectedPage === pg.id ? '#6366F1' : '#CBD5E1'}`, background: selectedPage === pg.id ? '#6366F1' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {selectedPage === pg.id && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: selectedPage === pg.id ? C.a1 : C.t1 }}>{pg.name}</div>
-                      <div style={s.tiny}>{pg.followers} followers · {pg.category}</div>
-                    </div>
-                  </div>
-                ))}
+      {/* ── Modal ── */}
+      {showModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,25,55,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(3px)' }} onClick={e => e.target === e.currentTarget && setShowModal(false)}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: 28, width: 560, maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(14,25,55,.18)' }}>
+
+            {/* Modal header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 32, height: 32, background: '#1877F2', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#fff' }}>f</div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>Meta Account Setup</div>
+                  <div style={s.tiny}>Select the page and ad account to use with Zipto</div>
+                </div>
               </div>
+              <div onClick={() => setShowModal(false)} style={{ width: 28, height: 28, borderRadius: '50%', background: '#F3F6FB', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, color: C.t3 }}>×</div>
             </div>
-            {/* Ad Account selector */}
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Ad Account</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-                {adAccounts.map(acc => (
-                  <div key={acc.id} onClick={() => setSelectedAd(acc.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 12, border: `2px solid ${selectedAd === acc.id ? '#6366F1' : '#E2E8F0'}`, background: selectedAd === acc.id ? '#EEF2FF' : '#fff', cursor: 'pointer', transition: 'all .15s' }}>
-                    <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${selectedAd === acc.id ? '#6366F1' : '#CBD5E1'}`, background: selectedAd === acc.id ? '#6366F1' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {selectedAd === acc.id && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: selectedAd === acc.id ? C.a1 : C.t1 }}>{acc.name}</div>
-                      <div style={s.tiny}>{acc.id} · {acc.currency}</div>
-                    </div>
+
+            {/* Facebook Page */}
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Facebook Page</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+              {fbPages.map(pg => (
+                <div key={pg.id} onClick={() => setDraftPage(pg.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 12, border: `2px solid ${draftPage === pg.id ? '#6366F1' : '#E2E8F0'}`, background: draftPage === pg.id ? '#EEF2FF' : '#F8FAFD', cursor: 'pointer', transition: 'all .15s' }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${draftPage === pg.id ? '#6366F1' : '#CBD5E1'}`, background: draftPage === pg.id ? '#6366F1' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {draftPage === pg.id && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
                   </div>
-                ))}
-              </div>
-              <div style={{ background: '#EEF2FF', borderRadius: 10, padding: '9px 12px', fontSize: 11, color: C.a1, marginBottom: 12 }}>
-                💡 Your selected page and ad account will be used for all Zipto campaigns by default.
-              </div>
-              <Btn variant="primary" style={{ width: '100%', justifyContent: 'center' }}>Save selection</Btn>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: draftPage === pg.id ? C.a1 : C.t1 }}>{pg.name}</div>
+                    <div style={s.tiny}>{pg.followers} followers · {pg.category}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Ad Account */}
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.t1, marginBottom: 10 }}>Select Ad Account</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 22 }}>
+              {adAccounts.map(acc => (
+                <div key={acc.id} onClick={() => setDraftAd(acc.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 12, border: `2px solid ${draftAd === acc.id ? '#6366F1' : '#E2E8F0'}`, background: draftAd === acc.id ? '#EEF2FF' : '#F8FAFD', cursor: 'pointer', transition: 'all .15s' }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${draftAd === acc.id ? '#6366F1' : '#CBD5E1'}`, background: draftAd === acc.id ? '#6366F1' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {draftAd === acc.id && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: draftAd === acc.id ? C.a1 : C.t1 }}>{acc.name}</div>
+                    <div style={s.tiny}>{acc.id} · {acc.currency}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: '#EEF2FF', borderRadius: 10, padding: '9px 12px', fontSize: 11, color: C.a1, marginBottom: 18 }}>
+              💡 These will be the default page and ad account used across all Zipto campaigns.
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <Btn variant="secondary" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setShowModal(false)}>Cancel</Btn>
+              <Btn variant="primary" style={{ flex: 2, justifyContent: 'center' }} onClick={handleSave}>Save & Connect</Btn>
             </div>
           </div>
         </div>
