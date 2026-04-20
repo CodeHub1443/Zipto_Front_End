@@ -1,27 +1,145 @@
 import React, { useState } from 'react';
 import { PageShell } from '../components/ui';
+import { C, gradHero, gradPrimary } from '../tokens';
 
-const C = {
-  white:'#FFFFFF', inner:'#F3F6FB', content:'#EEF1F6',
-  a1:'#6366F1', a2:'#818CF8', a3:'#38BDF8',
-  t1:'#141921', t2:'#5C6678', t3:'#9BA5B7', border:'#E8ECF3',
-  green:'#22C55E', coral:'#F97316', purple:'#7C3AED',
-  teal:'#06B6D4', red:'#EF4444', amber:'#F59E0B',
+// ─── Analytics-Specific Premium Styles (Local) ──────────────────────
+
+const s = {
+  card: {
+    background: '#FFFFFF',
+    borderRadius: 18,
+    padding: 18,
+    boxShadow: '0 2px 20px rgba(14,25,55,.07)',
+  },
+  inner: {
+    background: '#F3F6FB',
+    borderRadius: 12,
+    padding: '12px 14px',
+  },
+  pgCtx: {
+    fontSize: 11,
+    fontWeight: 500,
+    color: '#9BA5B7',
+    letterSpacing: '.07em',
+    textTransform: 'uppercase',
+    marginBottom: 3,
+  },
+  pgTitle: {
+    fontSize: 25,
+    fontWeight: 300,
+    color: '#141921',
+    lineHeight: 1.2,
+  },
+  sect: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#141921',
+  },
+  subl: {
+    fontSize: 10,
+    fontWeight: 700,
+    color: '#9BA5B7',
+    textTransform: 'uppercase',
+    letterSpacing: '.07em',
+  },
+  bignum: {
+    fontSize: 30,
+    fontWeight: 800,
+    color: '#141921',
+    lineHeight: 1,
+  },
+  mednum: {
+    fontSize: 21,
+    fontWeight: 700,
+    color: '#141921',
+  },
+  muted: {
+    fontSize: 12,
+    color: '#9BA5B7',
+  },
+  tiny: {
+    fontSize: 11,
+    color: '#9BA5B7',
+  },
 };
 
-function Ic({ d, s = 16, c = 'currentColor', w = 1.8 }) {
-  return <svg width={s} height={s} fill="none" stroke={c} strokeWidth={w} viewBox="0 0 24 24" style={{ flexShrink: 0 }}><path d={d} /></svg>;
+// ─── Local Components (V1 Design) ──────────────────────────────────
+
+function V1IconBadge({ color = 'indigo', size = 38, children }) {
+  const colors = {
+    indigo: '#6366F1', teal: '#06B6D4', purple: '#7C3AED',
+    coral: '#F97316', green: '#22C55E', pink: '#D946EF',
+    blue: '#3B82F6', amber: '#F59E0B', red: '#EF4444',
+  };
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: colors[color] || color,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+    }}>
+      {children}
+    </div>
+  );
 }
-const ICON = {
-  pause: 'M6 4h4v16H6z M14 4h4v16h-4z',
-  play:  'M5 3l14 9-14 9V3z',
-  warn:  'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z M12 9v4 M12 17h.01',
-  check: 'M20 6L9 17l-5-5',
-  trend: 'M23 6l-9.5 9.5-5-5L1 18',
-  plus:  'M12 5v14 M5 12h14',
-  chart: 'M18 20V10 M12 20V4 M6 20v-6',
-  camp:  'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z',
-};
+
+function V1ProgressBar({ pct, variant = 'purple', height = 6 }) {
+  const fills = {
+    purple: 'linear-gradient(90deg, #8B5CF6, #6366F1)',
+    cyan:   'linear-gradient(90deg, #22D3EE, #06B6D4)',
+    green:  '#22C55E',
+    orange: '#F97316',
+  };
+  return (
+    <div style={{ height, background: '#E5EAF3', borderRadius: height / 2, overflow: 'hidden' }}>
+      <div style={{
+        height: '100%', width: `${pct}%`, borderRadius: height / 2,
+        background: fills[variant] || fills.purple,
+      }} />
+    </div>
+  );
+}
+
+function V1Badge({ variant = 'gray', dot, children }) {
+  const variants = {
+    green:  { background: '#ECFDF5', color: '#059669' },
+    blue:   { background: '#EEF2FF', color: '#6366F1' },
+    orange: { background: '#FFF7ED', color: '#EA580C' },
+    red:    { background: '#FEF2F2', color: '#DC2626' },
+    gray:   { background: '#F3F6FB', color: '#5C6678' },
+  };
+  const style = variants[variant] || variants.gray;
+  const dotColor = { green: '#22C55E', orange: '#F97316', red: '#EF4444', blue: '#6366F1' }[dot || variant] || '#9BA5B7';
+  
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 9px',
+      borderRadius: 100, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap', ...style
+    }}>
+      {dot && <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, display: 'inline-block' }} />}
+      {children}
+    </span>
+  );
+}
+
+function V1DualBars({ label1, pct1, label2, pct2 }) {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+        <span style={s.tiny}>{label1}</span>
+        <span style={{ fontSize: 11, fontWeight: 700 }}>{pct1}%</span>
+      </div>
+      <V1ProgressBar pct={pct1} variant="purple" height={4} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, marginTop: 7 }}>
+        <span style={s.tiny}>{label2}</span>
+        <span style={{ fontSize: 11, fontWeight: 700 }}>{pct2}%</span>
+      </div>
+      <V1ProgressBar pct={pct2} variant="cyan" height={4} />
+    </div>
+  );
+}
+
+// ─── Campaign Logic Components (Preserved from Current) ─────────────
 
 function Sparkline({ data, color, h = 28 }) {
   const w = 80, pad = 4;
@@ -40,17 +158,63 @@ function Sparkline({ data, color, h = 28 }) {
   );
 }
 
-const STATUS_STYLES = {
-  live:     { bg: '#ECFDF5', c: '#059669', label: 'Live'     },
-  paused:   { bg: '#FFFBEB', c: '#B45309', label: 'Paused'   },
-  rejected: { bg: '#FEF2F2', c: '#DC2626', label: 'Rejected' },
-  ended:    { bg: C.inner,   c: C.t2,      label: 'Ended'    },
-};
+function CampaignCard({ camp, onToggle, onScale }) {
+  const pct = Math.round((camp.spent / camp.budget) * 100);
+  const cols = [
+    { label: 'Reach',    val: camp.reach,    key: 'reach', inv: false },
+    { label: 'CTR',      val: camp.ctr,      key: 'ctr',   inv: false },
+    { label: 'CPC',      val: camp.cpc,      key: 'cpc',   inv: true  },
+    { label: 'Messages', val: camp.msgs,     key: 'msgs',  inv: false },
+    { label: 'Variants', val: camp.variants, noTrend: true             },
+  ];
 
-function StatusBadge({ status }) {
-  const s = STATUS_STYLES[status] || STATUS_STYLES.ended;
-  return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 100, fontSize: 10, fontWeight: 600, background: s.bg, color: s.c }}>{s.label}</span>;
+  return (
+    <div style={{ ...s.card, marginBottom: 10, border: camp.status === 'rejected' ? `1.5px solid #EF444430` : camp.hasWinner ? `1.5px solid #22C55E40` : '1.5px solid transparent' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          {camp.status === 'live' && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#141921', marginBottom: 3 }}>{camp.name}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <V1Badge variant={camp.status === 'rejected' ? 'red' : camp.status === 'paused' ? 'orange' : 'green'}>{camp.status.charAt(0).toUpperCase() + camp.status.slice(1)}</V1Badge>
+              {camp.hasWinner && <V1Badge variant="green" dot="green">🏆 Winner found</V1Badge>}
+              <span style={s.tiny}>{camp.platform}</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+           <button onClick={onToggle} style={{ width: 30, height: 30, background: '#F3F6FB', border: 'none', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+             {camp.status === 'live' ? '⏸' : '▶'}
+           </button>
+           {camp.hasWinner && <button onClick={onScale} style={{ padding: '5px 12px', background: gradPrimary, border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>Scale</button>}
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8, marginBottom: 12 }}>
+        {cols.map(({ label, val, key, inv, noTrend }) => {
+          const data = camp.trends?.[key];
+          const up   = data && data[data.length - 1] >= data[0];
+          const good = inv ? !up : up;
+          return (
+            <div key={label} style={{ ...s.inner, padding: '7px 9px', textAlign: 'center' }}>
+              <div style={s.subl}>{label}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#141921' }}>{val}</div>
+              {!noTrend && data && <div style={{ display: 'flex', justifyContent: 'center', marginTop: 3 }}><Sparkline data={data} color={good ? '#22C55E' : '#F97316'} h={22} /></div>}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <span style={s.tiny}>Budget: <strong>${camp.spent} of ${camp.budget}</strong></span>
+        <span style={{ fontSize: 10, color: pct >= 80 ? '#F59E0B' : '#9BA5B7' }}>{100 - pct}% remaining</span>
+      </div>
+      <V1ProgressBar pct={pct} variant={pct >= 80 ? 'orange' : 'purple'} height={4} />
+    </div>
+  );
 }
+
+// ─── Static Data ───────────────────────────────────────────────────
 
 const INIT_CAMPAIGNS = [
   {
@@ -73,182 +237,126 @@ const INIT_CAMPAIGNS = [
   },
 ];
 
-function CampaignCard({ camp, onToggle, onScale }) {
-  const pct = Math.round((camp.spent / camp.budget) * 100);
-  const cols = [
-    { label: 'Reach',    val: camp.reach,    key: 'reach', inv: false },
-    { label: 'CTR',      val: camp.ctr,      key: 'ctr',   inv: false },
-    { label: 'CPC',      val: camp.cpc,      key: 'cpc',   inv: true  },
-    { label: 'Messages', val: camp.msgs,     key: 'msgs',  inv: false },
-    { label: 'Variants', val: camp.variants, noTrend: true             },
-  ];
-  return (
-    <div style={{ background: C.white, borderRadius: 16, padding: '14px 16px', boxShadow: '0 2px 14px rgba(14,25,55,.06)', border: camp.status === 'rejected' ? `1.5px solid ${C.red}30` : camp.hasWinner ? `1.5px solid ${C.green}40` : '1.5px solid transparent', marginBottom: 10 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          {camp.status === 'live' && <div style={{ width: 8, height: 8, borderRadius: '50%', background: C.green, flexShrink: 0, animation: 'lp 1.8s ease-in-out infinite' }} />}
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.t1, marginBottom: 3 }}>{camp.name}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <StatusBadge status={camp.status} />
-              {camp.hasWinner && <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 8px', borderRadius: 100, fontSize: 10, fontWeight: 600, background: '#ECFDF5', color: '#059669' }}>🏆 Winner found</span>}
-              <span style={{ fontSize: 10, color: C.t3 }}>{camp.platform}</span>
-            </div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          {camp.status === 'live'   && <div onClick={onToggle} style={{ width: 30, height: 30, background: C.inner, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Ic d={ICON.pause} s={12} c={C.t2} w={2} /></div>}
-          {camp.status === 'paused' && <div onClick={onToggle} style={{ width: 30, height: 30, background: '#ECFDF5', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Ic d={ICON.play} s={12} c={C.green} w={2} /></div>}
-          {camp.hasWinner && <div onClick={onScale} style={{ padding: '5px 12px', background: `linear-gradient(135deg,${C.a2},${C.a1})`, borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}><Ic d={ICON.trend} s={10} c="white" w={2} /> Scale</div>}
-          {camp.status === 'rejected' && <div style={{ padding: '5px 12px', background: '#FEF2F2', border: `1px solid ${C.red}30`, borderRadius: 8, fontSize: 11, fontWeight: 600, color: C.red, cursor: 'pointer' }}>Fix with AI</div>}
-        </div>
-      </div>
+// ─── Main Analytics Page ───────────────────────────────────────────
 
-      {/* Metric grid with sparklines */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8, marginBottom: 12 }}>
-        {cols.map(({ label, val, key, inv, noTrend }) => {
-          const data = camp.trends?.[key];
-          const up   = data && data[data.length - 1] >= data[0];
-          const good = inv ? !up : up;
-          return (
-            <div key={label} style={{ background: C.inner, borderRadius: 9, padding: '7px 9px', textAlign: 'center' }}>
-              <div style={{ fontSize: 9, color: C.t3, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 2 }}>{label}</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>{val}</div>
-              {!noTrend && data && <div style={{ display: 'flex', justifyContent: 'center', marginTop: 3 }}><Sparkline data={data} color={good ? C.green : C.coral} h={22} /></div>}
-              {noTrend && <div style={{ fontSize: 10, color: C.t3, marginTop: 2 }}>active</div>}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Budget bar */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-          <span style={{ fontSize: 11, color: C.t2 }}>Budget: <strong style={{ color: pct >= 80 ? C.amber : C.t1 }}>${camp.spent} of ${camp.budget}</strong></span>
-          <span style={{ fontSize: 10, color: pct >= 80 ? C.amber : C.t3, fontWeight: pct >= 80 ? 600 : 400 }}>{pct >= 80 ? `⚠ ${100 - pct}% left` : `${100 - pct}% remaining`}</span>
-        </div>
-        <div style={{ height: 4, background: '#E5EAF3', borderRadius: 2, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${pct}%`, borderRadius: 2, background: pct >= 80 ? `linear-gradient(90deg,${C.amber},${C.coral})` : `linear-gradient(90deg,${C.a1},${C.teal})`, transition: 'width .4s' }} />
-        </div>
-      </div>
-
-      {/* Winner insight */}
-      {camp.hasWinner && (
-        <div style={{ marginTop: 10, background: '#ECFDF5', border: '1px solid #BBF7D0', borderRadius: 10, padding: '8px 11px', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 14 }}>🏆</span>
-          <div style={{ flex: 1, fontSize: 11, color: '#065F46' }}><strong>"{camp.winnerName}"</strong> — {camp.winnerLift} better CTR. Pause others?</div>
-          <div style={{ display: 'flex', gap: 5 }}>
-            <span onClick={onScale} style={{ padding: '4px 10px', background: C.green, borderRadius: 6, fontSize: 10, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>Scale it</span>
-            <span style={{ padding: '4px 10px', background: C.inner, borderRadius: 6, fontSize: 10, color: C.t2, cursor: 'pointer' }}>Keep all</span>
-          </div>
-        </div>
-      )}
-
-      {/* Rejection banner */}
-      {camp.status === 'rejected' && (
-        <div style={{ marginTop: 10, background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '8px 11px', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 14 }}>⚠️</span>
-          <div style={{ flex: 1, fontSize: 11, color: '#7F1D1D' }}>Meta rejected: {camp.rejectionReason}. <strong>Sellix can fix automatically.</strong></div>
-          <span style={{ padding: '4px 10px', background: C.red, borderRadius: 6, fontSize: 10, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>Auto-fix</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function Analytics({ alertCount, onAlertClick }) {
+export default function Analytics({ alertCount, onAlertClick, onNavigate }) {
   const [campaigns, setCampaigns] = useState(INIT_CAMPAIGNS);
-
   const toggle = (id) => setCampaigns(p => p.map(c => c.id === id ? { ...c, status: c.status === 'live' ? 'paused' : 'live' } : c));
   const scale  = (id) => setCampaigns(p => p.map(c => c.id === id ? { ...c, hasWinner: false, budget: Math.round(c.budget * 1.4) } : c));
 
-  const live   = campaigns.filter(c => c.status === 'live').length;
-  const paused = campaigns.filter(c => c.status === 'paused').length;
-  const issues = campaigns.filter(c => c.status === 'rejected').length;
-
   return (
     <PageShell active="analytics" alertCount={alertCount} onAlertClick={onAlertClick}>
-    <div style={{ padding: '16px 20px', height: '100%', overflowY: 'auto' }}>
-      <style>{`@keyframes lp { 0%,100%{opacity:1} 50%{opacity:.35} }`}</style>
-
-      {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <div>
-          <div style={{ fontSize: 10, fontWeight: 600, color: C.t3, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>Analytics</div>
-          <div style={{ fontSize: 22, fontWeight: 300, color: C.t1 }}>Campaign <strong style={{ fontWeight: 800 }}>lifecycle</strong></div>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button style={{ padding: '6px 14px', background: `linear-gradient(135deg,${C.a2},${C.a1})`, border: 'none', borderRadius: 9, fontSize: 12, fontWeight: 600, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit' }}>
-            <Ic d={ICON.plus} s={12} c="white" w={2.5} /> New campaign
-          </button>
-        </div>
-      </div>
-
-      {/* Status summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, marginBottom: 14 }}>
-        {[
-          { label: 'Live now',         value: live,   color: C.green,  ip: ICON.chart, bg: '#ECFDF5' },
-          { label: 'Paused',           value: paused, color: C.amber,  ip: ICON.pause, bg: '#FFFBEB' },
-          { label: 'Need attention',   value: issues, color: C.red,    ip: ICON.warn,  bg: '#FEF2F2' },
-          { label: 'Total this month', value: campaigns.length, color: C.a1, ip: ICON.camp, bg: '#EEF2FF' },
-        ].map(({ label, value, color, ip, bg }) => (
-          <div key={label} style={{ background: bg, borderRadius: 13, padding: '11px 13px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 9, background: `${color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Ic d={ip} s={14} c={color} w={2} />
-            </div>
-            <div>
-              <div style={{ fontSize: 20, fontWeight: 700, color, lineHeight: 1 }}>{value}</div>
-              <div style={{ fontSize: 10, color, opacity: 0.8 }}>{label}</div>
-            </div>
+      <div style={{ padding: '18px 22px', height: '100%', overflowY: 'auto' }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div>
+            <div style={s.pgCtx}>Performance</div>
+            <div style={s.pgTitle}>Analytics <b>dashboard</b></div>
           </div>
-        ))}
-      </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button style={{ padding: '7px 15px', borderRadius: 9, fontSize: 13, fontWeight: 600, background: '#F3F6FB', border: 'none', color: '#5C6678', cursor: 'pointer' }}>Export</button>
+            <button style={{ padding: '7px 15px', borderRadius: 9, fontSize: 13, fontWeight: 600, background: gradPrimary, border: 'none', color: '#fff', cursor: 'pointer' }}>+ Campaign</button>
+          </div>
+        </div>
 
-      {/* Live campaigns section label */}
-      <div style={{ fontSize: 11, fontWeight: 700, color: C.t3, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 7, height: 7, borderRadius: '50%', background: C.green, animation: 'lp 1.8s ease-in-out infinite' }} />
-        Live campaigns — real-time
-      </div>
-
-      {campaigns.map(c => (
-        <CampaignCard key={c.id} camp={c} onToggle={() => toggle(c.id)} onScale={() => scale(c.id)} />
-      ))}
-
-      {/* Brand performance */}
-      <div style={{ fontSize: 11, fontWeight: 700, color: C.t3, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, marginTop: 6 }}>
-        Brand performance · This month
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <div style={{ background: C.white, borderRadius: 14, padding: '13px 14px', boxShadow: '0 2px 12px rgba(14,25,55,.06)' }}>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12 }}>Reach over time</div>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', marginBottom: 6, height: 80 }}>
-            {[['W1', 44, '48K'], ['W2', 62, '68K'], ['W3', 55, '59K'], ['W4', 78, '87K']].map(([w, h, r]) => (
-              <div key={w} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ fontSize: 9, color: C.t3 }}>{r}</div>
-                <div style={{ width: '100%', borderRadius: 4, background: `linear-gradient(180deg,${C.a1},${C.a2})`, height: h }} />
-                <span style={{ fontSize: 10, color: C.t3 }}>{w}</span>
+        {/* Hero Card */}
+        <div style={{ ...s.card, background: gradHero, border: 'none', padding: '20px 24px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 54, height: 54, background: 'rgba(255,255,255,.18)', borderRadius: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#fff' }}>KB</div>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>KB Aviation <span style={{ fontSize: 11, background: 'rgba(255,255,255,.18)', padding: '2px 9px', borderRadius: 100, fontWeight: 500, marginLeft: 7 }}>10K Club</span></div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,.7)' }}>Travel service · Seoul, South Korea</div>
               </div>
-            ))}
+            </div>
+            <div style={{ display: 'flex', gap: 28 }}>
+              {[['14.2K','Reach'],['8.9%','Avg CTR'],['Live','Status']].map(([v, l]) => (
+                <div key={l} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>{v}</div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,.65)' }}>{l}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ background: 'rgba(255,255,255,.16)', color: '#fff', border: '1px solid rgba(255,255,255,.26)', borderRadius: 9, padding: '8px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+               Manage on FB →
+            </div>
           </div>
-          <div style={{ fontSize: 10, color: C.green, fontWeight: 600 }}>▲ 24% vs last month</div>
         </div>
-        <div style={{ background: C.white, borderRadius: 14, padding: '13px 14px', boxShadow: '0 2px 12px rgba(14,25,55,.06)' }}>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10 }}>⚡ Sellix recommends</div>
+
+        {/* Pulse Metrics */}
+        <div style={{ ...s.subl, marginBottom: 8 }}>BRAND PULSE</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
           {[
-            { msg: 'Scale "Route Reel" winner — 2.4× CTR',  color: C.green,  act: 'Scale'    },
-            { msg: 'Fix rejected Summer Sale ad',            color: C.red,    act: 'Fix now'  },
-            { msg: 'Post tonight 6–8 PM — peak window',      color: C.purple, act: 'Schedule' },
-            { msg: 'Extend Seoul-Dubai budget by $30',        color: C.amber,  act: 'Extend'   },
-          ].map(({ msg, color, act }) => (
-            <div key={msg} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: `1px solid ${C.border}` }}>
-              <span style={{ fontSize: 11, color: C.t2, flex: 1, paddingRight: 8 }}>{msg}</span>
-              <span style={{ padding: '3px 9px', background: `${color}14`, color, borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>{act}</span>
+            { label: 'Weekly Reach', value: '52,841', color: 'indigo', icon: 'M12 2a10 10 0 100 20A10 10 0 0012 2z M2 12h20', badge: <V1Badge variant="green">▲ 8.2%</V1Badge> },
+            { label: 'New Leads', value: '189', color: 'teal', icon: 'M12 11a4 4 0 100-8 4 4 0 000 8z M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2', badge: <V1Badge variant="green">▲ 4.1%</V1Badge> },
+            { label: 'Conversations', value: '47', color: 'purple', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z', badge: <V1Badge variant="blue">Active</V1Badge> },
+            { label: 'Efficiency', value: '78%', color: 'amber', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', isDual: true },
+          ].map((m) => (
+            <div key={m.label} style={s.card}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={s.muted}>{m.label}</span>
+                <V1IconBadge color={m.color} size={28}>
+                  <svg width="12" height="12" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><path d={m.icon} /></svg>
+                </V1IconBadge>
+              </div>
+              <div style={s.mednum}>{m.value}</div>
+              {m.isDual ? (
+                <div style={{ marginTop: 8 }}><V1DualBars label1="Auto" pct1={78} label2="Man" pct2={22} /></div>
+              ) : (
+                <div style={{ marginTop: 8 }}>{m.badge}</div>
+              )}
             </div>
           ))}
         </div>
+
+        {/* Campaign Life Cycle Section */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 20 }}>
+          <div>
+            <div style={{ ...s.subl, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E' }} />
+               CAMPAIGN LIFE CYCLE — ACTIVE
+            </div>
+            {campaigns.map(c => (
+              <CampaignCard key={c.id} camp={c} onToggle={() => toggle(c.id)} onScale={() => scale(c.id)} />
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+             <div style={{ ...s.card, padding: 16 }}>
+                <div style={{ ...s.sect, marginBottom: 12 }}>⚡ Zipto Recommendations</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                   {[
+                     { msg: 'Boost Summer Sale 🔥', sub: '3× avg engagement', btn: 'Boost', clr: '#F59E0B' },
+                     { msg: 'Fix rejected Ad ⚠️', sub: 'Detected in Campaign #1', btn: 'Fix', clr: '#EF4444' },
+                     { msg: 'Post tonight 6–8pm 📅', sub: 'Peak audience window', btn: 'Sched', clr: '#22C55E' },
+                   ].map(x => (
+                     <div key={x.msg} style={{ ...s.inner, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div>
+                           <div style={{ fontSize: 13, fontWeight: 500 }}>{x.msg}</div>
+                           <div style={s.tiny}>{x.sub}</div>
+                        </div>
+                        <button style={{ padding: '5px 12px', background: x.clr, color: '#fff', border: 'none', borderRadius: 7, fontSize: 10, fontWeight: 700, cursor: 'pointer' }}>{x.btn}</button>
+                     </div>
+                   ))}
+                </div>
+             </div>
+
+             <div style={{ ...s.card, padding: 16 }}>
+                <div style={{ ...s.sect, marginBottom: 10 }}>Top post this week</div>
+                <div style={s.inner}>
+                   <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 8 }}>✈️ Seoul to Dubai route launch details...</div>
+                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, textAlign: 'center' }}>
+                      {[['1.2K','Likes'],['89','Comments'],['247','Shares']].map(([v,l]) => (
+                        <div key={l}><div style={{ fontSize: 16, fontWeight: 800, color: '#6366F1' }}>{v}</div><div style={s.tiny}>{l}</div></div>
+                      ))}
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+
       </div>
-    </div>
     </PageShell>
   );
 }
